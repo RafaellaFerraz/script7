@@ -1,10 +1,11 @@
 /*
  * pipeline input parameters
  */
-params.reads = "$projectDir/data/ggal/*{1,2}.fq"
+params.reads = "$projectDir/data/ggal/*_{1,2}.fq"
 params.transcriptome_file = "$projectDir/data/ggal/transcriptome.fa"
 params.multiqc = "$projectDir/multiqc"
 params.outdir = "results"
+
 log.info """\
     R N A S E Q - N F   P I P E L I N E
     ===================================
@@ -21,6 +22,7 @@ log.info """\
 process INDEX {
     input:
     path transcriptome
+    container 'quay.io/biocontainers/salmon:1.10.1--hecfa306_2'
 
     output:
     path 'salmon_index'
@@ -33,7 +35,7 @@ process INDEX {
 
 process QUANTIFICATION {
     tag "Salmon on $sample_id"
-    publishDir params.outdir, mode:'copy'
+    container 'quay.io/biocontainers/salmon:1.10.1--hecfa306_2'
 
     input:
     path salmon_index
@@ -50,6 +52,8 @@ process QUANTIFICATION {
 
 process FASTQC {
     tag "FASTQC on $sample_id"
+    container 'docker-fastqc2'
+    container 'quay.io/biocontainers/fastqc:0.12.1--hdfd78af_0'
 
     input:
     tuple val(sample_id), path(reads)
@@ -65,10 +69,12 @@ process FASTQC {
 }
 
 process MULTIQC {
-
+    publishDir params.outdir, mode:'copy'
+    container 'docker-multiqc'
+    
     input:
     path '*'
-
+    
     output:
     path 'multiqc_report.html'
 
