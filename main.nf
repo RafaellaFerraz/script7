@@ -119,3 +119,6 @@ workflow {
 workflow.onComplete {
     log.info ( workflow.success ? "\nDone! Open the following report in your browser --> $params.outdir/multiqc_report.html\n" : "Oops .. something went wrong" )
 }
+
+
+// comando: nextflow run RafaellaFerraz/script7 -r main --reads './data/ggal/*_{1,2}.fq' --transcriptome_file ./data/ggal/transcriptome.fa
